@@ -18,27 +18,20 @@ def main():
     physicsClient = p.connect(p.GUI)#or p.DIRECT for non-graphical version
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
     p.setGravity(0,0,-10)
-
     box_id = p.loadURDF("two-link.urdf.xml", useFixedBase=True)
     p.changeDynamics(box_id, 1, linearDamping=0, angularDamping=0)
     p.changeDynamics(box_id, 2, linearDamping=0, angularDamping=0)
-
     p.setJointMotorControl2(bodyIndex=box_id, jointIndex=1, targetPosition=th0, controlMode=p.POSITION_CONTROL)
     for _ in range(1000):
         p.stepSimulation()
-
     p.setJointMotorControl2(box_id, 1, p.VELOCITY_CONTROL, targetVelocity=0, force=0)
-
     pos0 = p.getLinkState(box_id, 4)[0]
     X0 = np.array([pos0[0], pos0[2]])
-
     log_x = np.zeros_like(log_t)
     log_z = np.zeros_like(log_t)
-
     for i, t in enumerate(log_t):
         th1, vel1 = p.getJointState(box_id, 1)[0:2]
         th2, vel2 = p.getJointState(box_id, 3)[0:2]
-
         pos = p.getLinkState(box_id, 4)[0]
         log_x[i], log_z[i] = pos[0], pos[2]
         # Calculation of the Jacobian via PyBullet
@@ -74,7 +67,6 @@ def main():
         p.stepSimulation()
         time.sleep(dt)
     p.disconnect()
-
 
 if __name__ == "__main__":
     main()
